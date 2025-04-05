@@ -86,21 +86,25 @@
         android:id="@+id/editDose"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        app:layout_constraintBottom_toTopOf="@+id/txtTipoMed"
 
-        app:layout_constraintTop_toBottomOf="@+id/editDesc"
-        tools:layout_editor_absoluteX="16dp" />
+        android:layout_marginTop="32dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/editDesc" />
 
     <TextView
         android:id="@+id/txtTipoMed"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
+        android:layout_marginTop="44dp"
         android:text="Tipo Medicamento:"
         android:textAlignment="center"
         android:textColor="@color/black"
         android:textSize="20sp"
-        tools:layout_editor_absoluteY="331dp" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/editDose" />
 
     <EditText
         android:id="@+id/editNomeMed"
@@ -108,8 +112,8 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="36dp"
         android:hint="Nome Medicamento"
-        app:layout_constraintTop_toBottomOf="@+id/txtMed"
-        tools:layout_editor_absoluteX="16dp" />
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/txtMed" />
 
 
     <TextView
@@ -125,6 +129,7 @@
         android:textSize="26sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/btnAtualizarMed"
         app:layout_constraintTop_toBottomOf="@+id/txtHoraMedicamento" />
 
     <TextView
@@ -138,6 +143,7 @@
         android:textSize="18sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/receberDataHora"
         app:layout_constraintTop_toBottomOf="@+id/txtTipoMed" />
 
     <Button
@@ -149,7 +155,9 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.502"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/receberDataHora" />
+        app:layout_constraintTop_toBottomOf="@+id/receberDataHora"
+        app:layout_constraintBottom_toTopOf="@id/btnAtualizarMed"
+        />
 
     <Button
         android:id="@+id/btnAtualizarMed"
@@ -159,7 +167,9 @@
         android:text="Atulizar Medicamento!"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btnAdicionarMed" />
+        app:layout_constraintTop_toBottomOf="@+id/btnAdicionarMed"
+        app:layout_constraintBottom_toTopOf="@+id/btnExcluirMed"
+        />
 
     <Button
         android:id="@+id/btnExcluirMed"
@@ -168,6 +178,7 @@
 
 
         android:text="Excluir Medicamento!"
+        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/btnAtualizarMed" />
@@ -177,6 +188,7 @@
         android:layout_width="132dp"
         android:layout_height="24dp"
         android:paddingStart="10dp"
+        app:layout_constraintBottom_toBottomOf="@+id/txtTipoMed"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.175"
         app:layout_constraintStart_toEndOf="@+id/txtTipoMed"
