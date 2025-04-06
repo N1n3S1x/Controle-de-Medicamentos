@@ -2,9 +2,14 @@ package com.example.controle_de_medicamentos;
 
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteStatement;
 import android.os.Bundle;
 import android.view.View;
+import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -12,11 +17,21 @@ import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 
 public class Tela_Editar_Medicamento extends AppCompatActivity {
 
     private TextView receberDataHora;
+    private EditText editNomeMed;
+    private EditText editDesc;
+    private EditText editDose;
+    private Button btnAdicionarMed;
+    private Button btnAtualizarMed;
+    private Button btnExcluirMed;
+    private SQLiteDatabase bancoDeDados;
+
+    private ArrayList<String> itens_admMed;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -24,7 +39,40 @@ public class Tela_Editar_Medicamento extends AppCompatActivity {
 
         setContentView(R.layout.activity_tela_editar_medicamento);
 
-    }
+        editNomeMed = findViewById(R.id.editNomeMed);
+        editDesc = findViewById(R.id.editDesc);
+        editDose = findViewById(R.id.editDose);
+        receberDataHora = findViewById(R.id.receberDataHora);
+
+        btnAdicionarMed = findViewById(R.id.btnAdicionarMed);
+        btnAtualizarMed = findViewById(R.id.btnAtualizarMed);
+        btnExcluirMed = findViewById(R.id.btnExcluirMed);
+
+        btnAdicionarMed.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                _AdicionarMedicamento();
+            }
+        });
+
+
+        btnAtualizarMed.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                _AtualizarMedicamento();
+            }
+        });
+
+        btnExcluirMed.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                _ExcluirMedicamento();
+            }
+        });
+
+        }
+
+
 
 
 
@@ -62,5 +110,50 @@ public class Tela_Editar_Medicamento extends AppCompatActivity {
 
                 }, hora, minuto, true);
         timePickerDialog.show();
+    }
+
+    private void _AdicionarMedicamento(){
+        try {
+
+
+            String nomeMed = editNomeMed.getText().toString();
+            String descMed = editDesc.getText().toString();
+            String doseMed = editDose.getText().toString();
+            String dataHora = receberDataHora.getText().toString();
+
+            String admMed = itens_admMed.toString();
+
+
+            String sql = "INSERT INTO medicamentos (nomeMedicamento, dataHora, status, admMedicamento, descricao, dose) VALUES (?, ?, ?, ?, ?, ?)";
+            SQLiteStatement stmt = bancoDeDados.compileStatement(sql);
+            stmt.bindString(1, nomeMed);
+            stmt.bindString(2, dataHora);
+            stmt.bindString(3, "1"); //status de ativo
+            stmt.bindString(4, admMed); //status de ativo
+            stmt.bindString(5, descMed); //status de ativo
+            stmt.bindString(5, doseMed); //status de ativo
+            stmt.executeInsert();
+
+
+            Toast.makeText(Tela_Editar_Medicamento.this, "Medicamento adicionado com sucesso!",
+                    Toast.LENGTH_SHORT).show();
+
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+    }
+
+    private void _AtualizarMedicamento() {
+        try {
+        } catch (Exception e) {
+        }
+    }
+    private void _ExcluirMedicamento() {
+        try {
+        } catch (Exception e) {
+        }
     }
 }

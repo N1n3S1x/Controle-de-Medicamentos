@@ -80,10 +80,10 @@ public class MainActivity extends AppCompatActivity {
 
     public void _Criar_Banco_De_Dados() {
         try {
-            bancoDeDados = openOrCreateDatabase("ListaTarefasApp", MODE_PRIVATE, null);
+            bancoDeDados = openOrCreateDatabase("ControleMedicamentos", MODE_PRIVATE, null);
             bancoDeDados.execSQL("CREATE TABLE IF NOT EXISTS " +
                     "medicamentos (id INTEGER PRIMARY KEY AUTOINCREMENT," +
-                    "nomeMedicamento VARCHAR, dataHora VARCHAR, status VARCHAR,admMedicamento VARCHAR, descricao VARCHAR)");
+                    "nomeMedicamento VARCHAR, dataHora VARCHAR, status VARCHAR,admMedicamento VARCHAR, descricao VARCHAR, dose VARCHAR)");
         } catch (Exception e) {
             e.printStackTrace();
         }
