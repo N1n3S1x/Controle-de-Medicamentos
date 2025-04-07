@@ -231,7 +231,7 @@ public class MainActivity extends AppCompatActivity {
             intent.putExtra("status", statusMedicamento.get(position));
             intent.putExtra("admMedicamento", admMedicamento.get(position));
 
-            startActivity(intent);
+//            startActivity(intent);
             startActivityForResult(intent, 1);
 
 
@@ -244,7 +244,7 @@ public class MainActivity extends AppCompatActivity {
     private void mudarTelaInsercao(){
         try {
             Intent intent = new Intent(MainActivity.this, Tela_Editar_Medicamento.class);
-            startActivity(intent);
+//            startActivity(intent);
             startActivityForResult(intent, 1);
         } catch (Exception e) {
             e.printStackTrace();
