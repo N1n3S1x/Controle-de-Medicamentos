@@ -74,8 +74,27 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }));
 
-        carregarItens();
+        _CarregarItens();
 
+    }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == 1 && resultCode == RESULT_OK) { // ✅ Verifica se veio da MainActivity2
+            int id = data.getIntExtra("id", 0);
+            String tarefaAtualizada = data.getStringExtra("tarefa");
+            String dataHoraAtualizada = data.getStringExtra("dataHora");
+
+            // Atualiza os dados no banco ou na interface
+            _CarregarItens();
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        _CarregarItens(); // Recarrega a lista sempre que voltar para MainActivity
     }
 
     public void _Criar_Banco_De_Dados() {
@@ -89,9 +108,9 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
-    public void carregarItens() {
+    public void _CarregarItens() {
         try {
-            Cursor cursor = bancoDeDados.rawQuery("SELECT * FROM tarefas " +
+            Cursor cursor = bancoDeDados.rawQuery("SELECT * FROM medicamentos " +
                     "ORDER BY id DESC", null);
             //indíces das colunas
             int indiceId = cursor.getColumnIndex("id");
@@ -107,6 +126,9 @@ public class MainActivity extends AppCompatActivity {
             datasHoras = new ArrayList<>();
             statusMedicamento = new ArrayList<>();
             descricaoMedicamento = new ArrayList<>();
+            admMedicamento = new ArrayList<>();
+            //inicializar o adaptador
+
 
             //adaptador usando o layout customizado
             adaptador = new ArrayAdapter<String>(this, R.layout.linhacustomizada,
@@ -119,9 +141,9 @@ public class MainActivity extends AppCompatActivity {
                     TextView texto3 = view.findViewById(R.id.texto3);
 
                     // Define o valor do TextView de data/hora com base na posição -- retornando do BD
-                    texto1.setText(itens.get(position));
-                    texto2.setText(datasHoras.get(position));
-                    texto3.setText(admMedicamento.get(position));
+                    texto1.setText("Nome Medicamento: "+itens.get(position));
+                    texto2.setText("Período: "+datasHoras.get(position));
+                    texto3.setText("Adm. Medicamento: "+admMedicamento.get(position));
 
                     // Define o estilo do texto com base no status da tarefa
                     if (statusMedicamento.get(position).equals("1")) {
@@ -152,6 +174,8 @@ public class MainActivity extends AppCompatActivity {
                 itens.add(cursor.getString(indiceMedicamento));
                 datasHoras.add(cursor.getString(indiceDataHora));
                 statusMedicamento.add(cursor.getString(indiceStatus));
+                admMedicamento.add(cursor.getString(indice_admMed));
+                //descricaoMedicamento.add(cursor.getString(indice_descMed));
                 cursor.moveToNext();
             }
             cursor.close(); //liberando memória, tornando mais eficiente
@@ -164,9 +188,9 @@ public class MainActivity extends AppCompatActivity {
     private void alternarStatusTarefa(int position) {
         try {
             String novoStatus = statusMedicamento.get(position).equals("1") ? "0" : "1";
-            bancoDeDados.execSQL("UPDATE tarefas SET status = '" +
+            bancoDeDados.execSQL("UPDATE medicamentos SET status = '" +
                     novoStatus + "' WHERE id = " + ids.get(position));
-            carregarItens();
+            _CarregarItens();
             if (novoStatus.equals("1")) {
                 Toast.makeText(MainActivity.this, "Medicamento em Uso!",
                         Toast.LENGTH_SHORT).show();
@@ -208,7 +232,7 @@ public class MainActivity extends AppCompatActivity {
             intent.putExtra("admMedicamento", admMedicamento.get(position));
 
             startActivity(intent);
-//            finish();
+            startActivityForResult(intent, 1);
 
 
         }catch (Exception e) {
@@ -221,7 +245,7 @@ public class MainActivity extends AppCompatActivity {
         try {
             Intent intent = new Intent(MainActivity.this, Tela_Editar_Medicamento.class);
             startActivity(intent);
-            finish();
+            startActivityForResult(intent, 1);
         } catch (Exception e) {
             e.printStackTrace();
         }
