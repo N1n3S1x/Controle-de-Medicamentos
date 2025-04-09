@@ -1,12 +1,19 @@
 package com.example.controle_de_medicamentos;
 
 import android.app.AlertDialog;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.graphics.Paint;
+import android.os.Build;
 import android.os.Bundle;
+import android.text.Editable;
+import android.text.TextWatcher;
+import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
@@ -18,11 +25,27 @@ import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
 import java.util.ArrayList;
+//import do Menu
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
+import android.widget.SearchView;
+
+//Import do Alarme
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.Date;
+
 
 public class MainActivity extends AppCompatActivity {
 
@@ -35,12 +58,10 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<String> statusMedicamento;
     private ArrayList<String> descricaoMedicamento;
     private ArrayList<String> admMedicamento;
+    private ArrayList<String> doseMedicamento;
     private ArrayAdapter<String> adaptador;
     private TextView campoDataHora;
     private SQLiteDatabase bancoDeDados;
-
-
-
 
 
 
@@ -48,15 +69,40 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        Toolbar toolbar = findViewById(R.id.toolBar);
+        setSupportActionBar(toolbar);
+
+
 
         // Inicializar componentes da interface
-        editTextFiltro = findViewById(R.id.editTextFiltro);
+//        editTextFiltro = findViewById(R.id.editTextFiltro);
         botaoInserir = findViewById(R.id.botaoInserir);
         minhaListView = findViewById(R.id.minhaListView);
 
 
 
+
         _Criar_Banco_De_Dados();
+        // permissões para notificações 8.0+
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+            NotificationChannel channel = new NotificationChannel(
+                    "canal_notificacao",
+                    "Canal de Notificações",
+                    NotificationManager.IMPORTANCE_HIGH
+            );
+            channel.setDescription("Notificações do Controle de Medicamentos");
+            NotificationManager manager = getSystemService(NotificationManager.class);
+            manager.createNotificationChannel(channel);
+        }
+//        //Permissões para notificações 13.0+
+//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+//            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
+//                    != PackageManager.PERMISSION_GRANTED) {
+//                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.POST_NOTIFICATIONS}, 1001);
+//            }
+//        }
+
+
 
         botaoInserir.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -70,13 +116,46 @@ public class MainActivity extends AppCompatActivity {
         }));
 
         minhaListView.setOnItemLongClickListener(((parent, view, position, id) -> {
+
             editarMedicamento(position);
+
             return true;
         }));
 
         _CarregarItens();
 
+
+
     }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.menu_main, menu);
+
+        MenuItem searchItem = menu.findItem(R.id.action_search);
+        SearchView searchView = (SearchView) searchItem.getActionView();
+
+        searchView.setQueryHint("Buscar medicamento ou tipo...");
+
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                _FiltrarItens(query);
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                _FiltrarItens(newText);
+                return false;
+            }
+        });
+
+        return true;
+    }
+
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -119,6 +198,7 @@ public class MainActivity extends AppCompatActivity {
             int indiceStatus = cursor.getColumnIndex("status");
             int indice_admMed = cursor.getColumnIndex("admMedicamento");
             int indice_descMed = cursor.getColumnIndex("descricao");
+            int indice_doseMed = cursor.getColumnIndex("dose");
 
             //inicializar as listas
             ids = new ArrayList<>();
@@ -127,6 +207,8 @@ public class MainActivity extends AppCompatActivity {
             statusMedicamento = new ArrayList<>();
             descricaoMedicamento = new ArrayList<>();
             admMedicamento = new ArrayList<>();
+            doseMedicamento = new ArrayList<>();
+
             //inicializar o adaptador
 
 
@@ -175,7 +257,14 @@ public class MainActivity extends AppCompatActivity {
                 datasHoras.add(cursor.getString(indiceDataHora));
                 statusMedicamento.add(cursor.getString(indiceStatus));
                 admMedicamento.add(cursor.getString(indice_admMed));
-                //descricaoMedicamento.add(cursor.getString(indice_descMed));
+                descricaoMedicamento.add(cursor.getString(indice_descMed));
+                doseMedicamento.add(cursor.getString(indice_doseMed));
+                // Agendar notificação
+                if (statusMedicamento.get(ids.size() - 1).equals("1")) {
+                    agendarNotificacao(datasHoras.get(ids.size() - 1), itens.get(ids.size() - 1), ids.get(ids.size() - 1));
+
+                }
+
                 cursor.moveToNext();
             }
             cursor.close(); //liberando memória, tornando mais eficiente
@@ -185,19 +274,123 @@ public class MainActivity extends AppCompatActivity {
         }
     }
 
+    public void _FiltrarItens(String filtro) {
+        try {
+            Cursor cursor = bancoDeDados.rawQuery(
+                    "SELECT * FROM medicamentos WHERE nomeMedicamento LIKE ? OR admMedicamento LIKE ? ORDER BY id DESC",
+                    new String[]{"%" + filtro + "%", "%" + filtro + "%"}
+            );
+
+            int indiceId = cursor.getColumnIndex("id");
+            int indiceMedicamento = cursor.getColumnIndex("nomeMedicamento");
+            int indiceDataHora = cursor.getColumnIndex("dataHora");
+            int indiceStatus = cursor.getColumnIndex("status");
+            int indiceAdmMed = cursor.getColumnIndex("admMedicamento");
+            int indiceDescMed = cursor.getColumnIndex("descricao");
+            int indiceDoseMed = cursor.getColumnIndex("dose");
+
+            ids.clear();
+            itens.clear();
+            datasHoras.clear();
+            statusMedicamento.clear();
+            admMedicamento.clear();
+            descricaoMedicamento.clear();
+            doseMedicamento.clear();
+
+            cursor.moveToFirst();
+            while (!cursor.isAfterLast()) {
+                ids.add(cursor.getInt(indiceId));
+                itens.add(cursor.getString(indiceMedicamento));
+                datasHoras.add(cursor.getString(indiceDataHora));
+                statusMedicamento.add(cursor.getString(indiceStatus));
+                admMedicamento.add(cursor.getString(indiceAdmMed));
+                descricaoMedicamento.add(cursor.getString(indiceDescMed));
+                doseMedicamento.add(cursor.getString(indiceDoseMed));
+                cursor.moveToNext();
+            }
+
+            cursor.close();
+            adaptador.notifyDataSetChanged();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void agendarNotificacao(String horario, String nomeMedicamento, int idMedicamento) {
+        try {
+            // Parse do horário (formato HH:mm)
+            SimpleDateFormat formatoHora = new SimpleDateFormat("HH:mm");
+            Date hora = formatoHora.parse(horario);
+
+            Calendar calendarioAgora = Calendar.getInstance();
+            Calendar calendarioAlarme = Calendar.getInstance();
+            calendarioAlarme.setTime(hora);
+
+            // Ajustar para o mesmo dia de hoje
+            calendarioAlarme.set(Calendar.YEAR, calendarioAgora.get(Calendar.YEAR));
+            calendarioAlarme.set(Calendar.MONTH, calendarioAgora.get(Calendar.MONTH));
+            calendarioAlarme.set(Calendar.DAY_OF_MONTH, calendarioAgora.get(Calendar.DAY_OF_MONTH));
+
+            // Se o horário já passou hoje, agendar para amanhã
+            if (calendarioAlarme.before(calendarioAgora)) {
+                calendarioAlarme.add(Calendar.DAY_OF_MONTH, 1);
+            }
+
+            Intent intent = new Intent(this, AlarmReceiver.class);
+            intent.putExtra("nome", nomeMedicamento);
+
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(
+                    this, idMedicamento, intent,
+                    PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
+            );
+
+            AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+            long intervalo = AlarmManager.INTERVAL_DAY;
+
+            alarmManager.setRepeating(
+                    AlarmManager.RTC_WAKEUP,
+                    calendarioAlarme.getTimeInMillis(),
+                    intervalo,
+                    pendingIntent
+            );
+
+            Log.d("Alarme", "Notificação agendada para: " + calendarioAlarme.getTime().toString());
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+
+    public void cancelarNotificacao(int idMedicamento) {
+        Intent intent = new Intent(this, AlarmReceiver.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(
+                this, idMedicamento, intent,
+                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
+        );
+        AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+        alarmManager.cancel(pendingIntent);
+    }
+
     private void alternarStatusTarefa(int position) {
         try {
             String novoStatus = statusMedicamento.get(position).equals("1") ? "0" : "1";
+            int idMedicamento = ids.get(position);
+
             bancoDeDados.execSQL("UPDATE medicamentos SET status = '" +
-                    novoStatus + "' WHERE id = " + ids.get(position));
-            _CarregarItens();
+                    novoStatus + "' WHERE id = " + idMedicamento);
+
             if (novoStatus.equals("1")) {
-                Toast.makeText(MainActivity.this, "Medicamento em Uso!",
-                        Toast.LENGTH_SHORT).show();
+                agendarNotificacao(datasHoras.get(position), itens.get(position), idMedicamento);
+                Toast.makeText(MainActivity.this, "Medicamento em Uso!", Toast.LENGTH_SHORT).show();
             } else {
-                Toast.makeText(MainActivity.this, "Medicamento Finalizado!",
-                        Toast.LENGTH_SHORT).show();
+                cancelarNotificacao(idMedicamento);
+                Toast.makeText(MainActivity.this, "Medicamento Finalizado!", Toast.LENGTH_SHORT).show();
             }
+
+            _CarregarItens();
+
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -206,7 +399,7 @@ public class MainActivity extends AppCompatActivity {
     private void editarMedicamento(int position) {
         new AlertDialog.Builder(MainActivity.this)
                 .setTitle("Editar Tarefa")
-                .setMessage("Deseja editar a tarefa \"" + itens.get(position) + "\"?")
+                .setMessage("Deseja editar o medicamento \"" + itens.get(position) + "\"?")
                 .setPositiveButton("Sim", (dialog, which) -> {
                     mudarTelaEdicao(position);
                 })
@@ -223,6 +416,7 @@ public class MainActivity extends AppCompatActivity {
             Toast.makeText(MainActivity.this, "Editar Medicamento!",
                     Toast.LENGTH_SHORT).show();
 
+            boolean sinal = true;
 
             Intent intent = new Intent(MainActivity.this, Tela_Editar_Medicamento.class);
             intent.putExtra("id", ids.get(position));
@@ -231,11 +425,22 @@ public class MainActivity extends AppCompatActivity {
             intent.putExtra("status", statusMedicamento.get(position));
             intent.putExtra("admMedicamento", admMedicamento.get(position));
 
+            intent.putExtra("edicao_Med", true);
+            intent.putExtra("sinalEdicao", sinal);
+
+            intent.putExtra("descricaoMedicamento",
+                    (descricaoMedicamento.size() > position ? descricaoMedicamento.get(position) : ""));
+            intent.putExtra("doseMedicamento",
+                    (doseMedicamento.size() > position ? doseMedicamento.get(position) : ""));
+
+
+
 //            startActivity(intent);
             startActivityForResult(intent, 1);
 
 
         }catch (Exception e) {
+
             e.printStackTrace();
         }
 
@@ -250,5 +455,7 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
     }
+
+
 
 }

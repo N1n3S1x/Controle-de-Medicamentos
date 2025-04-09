@@ -10,23 +10,26 @@
     android:padding="16dp"
     tools:context=".MainActivity">
 
-    <EditText
-        android:id="@+id/editTextFiltro"
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolBar"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:hint="Pesquisa de medicamentos"/>
+        android:layout_height="?attr/actionBarSize"
+        android:background="?attr/colorPrimary"
+        android:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+        app:popupTheme="@style/ThemeOverlay.AppCompat.Light"
+        app:title="Controle de Medicamentos" />
 
     <Button
         android:id="@+id/botaoInserir"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="Adicionar medicamento!"/>
+        android:text="Adicionar medicamento!"
+        android:layout_marginTop="25sp"/>
 
     <ListView
         android:id="@+id/minhaListView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="26dp" />
-
 
 </LinearLayout>

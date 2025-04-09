@@ -1,198 +1,239 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:padding="16sp"
-    tools:context=".Tela_Editar_Medicamento">
+    android:fillViewport="true">
 
-
-    <TextView
-        android:id="@+id/txtMed"
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/main"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:text="Medicamento"
-        android:textAlignment="center"
-        android:textColor="@color/black"
-        android:textSize="26sp"
+        android:padding="16dp"
+        tools:context=".Tela_Editar_Medicamento">
 
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        <!-- conteúdo original -->
+        <TextView
+            android:id="@+id/txtMed"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Medicamento"
+            android:textAlignment="center"
+            android:textColor="@color/black"
+            android:textSize="26sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
+        <TextView
+            android:id="@+id/txtNomeMed"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start"
+            android:layout_marginTop="10dp"
+            android:text="Nome:"
+            android:textAlignment="textStart"
+            android:textColor="@color/black"
+            android:textSize="19dp"
+            app:layout_constraintBottom_toTopOf="@+id/editNomeMed"
+            app:layout_constraintStart_toStartOf="@+id/editNomeMed"
+            app:layout_constraintTop_toBottomOf="@+id/txtMed"
+            app:layout_constraintVertical_bias="1.0" />
 
-    <TextView
-        android:id="@+id/txtNomeMed"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="start"
-        android:layout_marginTop="10dp"
-        android:text="Nome:"
-        android:textAlignment="textStart"
-        android:textColor="@color/black"
-        android:textSize="19dp"
+        <TextView
+            android:id="@+id/txtDesc"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start"
+            android:layout_marginTop="10dp"
+            android:text="Descrição:"
+            android:textAlignment="textStart"
+            android:textColor="@color/black"
+            android:textSize="19dp"
+            app:layout_constraintBottom_toTopOf="@+id/editDesc"
+            app:layout_constraintStart_toStartOf="@+id/editDesc"
+            app:layout_constraintTop_toBottomOf="@+id/editNomeMed"
+            app:layout_constraintVertical_bias="1.0" />
 
+        <EditText
+            android:id="@+id/editDesc"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="36dp"
+            android:hint="Descrição Medicamento"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/editNomeMed" />
 
-        app:layout_constraintBottom_toTopOf="@+id/editNomeMed"
+        <TextView
+            android:id="@+id/txtDose"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="start"
+            android:text="Dose:"
+            android:textAlignment="textStart"
+            android:textColor="@color/black"
+            android:textSize="19dp"
+            app:layout_constraintStart_toStartOf="@+id/editDose"
+            app:layout_constraintBottom_toTopOf="@+id/editDose" />
 
-        app:layout_constraintStart_toStartOf="@+id/editNomeMed"
-        app:layout_constraintTop_toBottomOf="@+id/txtMed"
-        app:layout_constraintVertical_bias="1.0" />
+        <EditText
+            android:id="@+id/editDose"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/editDesc" />
 
-    <TextView
-        android:id="@+id/txtDesc"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="start"
-        android:layout_marginTop="10dp"
-        android:text="Descrição:"
-        android:textAlignment="textStart"
-        android:textColor="@color/black"
-        android:textSize="19dp"
+        <TextView
+            android:id="@+id/txtTipoMed"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="44dp"
+            android:text="Tipo Medicamento:"
+            android:textAlignment="center"
+            android:textColor="@color/black"
+            android:textSize="20sp"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/editDose" />
 
-        app:layout_constraintBottom_toTopOf="@+id/editDesc"
-        app:layout_constraintStart_toStartOf="@+id/editDesc"
-        app:layout_constraintTop_toBottomOf="@+id/editNomeMed"
-        app:layout_constraintVertical_bias="1.0" />
-
-    <EditText
-        android:id="@+id/editDesc"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="36dp"
-        android:hint="Descrição Medicamento"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editNomeMed" />
-
-
-    <TextView
-        android:id="@+id/txtDose"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="start"
-
-        android:text="Dose:"
-        android:textAlignment="textStart"
-        android:textColor="@color/black"
-        android:textSize="19dp"
-        app:layout_constraintStart_toStartOf="@+id/editDose"
-        app:layout_constraintBottom_toTopOf="@+id/editDose" />
-
-    <EditText
-        android:id="@+id/editDose"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-
-        android:layout_marginTop="32dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editDesc" />
-
-    <TextView
-        android:id="@+id/txtTipoMed"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginTop="44dp"
-        android:text="Tipo Medicamento:"
-        android:textAlignment="center"
-        android:textColor="@color/black"
-        android:textSize="20sp"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editDose" />
-
-    <EditText
-        android:id="@+id/editNomeMed"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="36dp"
-        android:hint="Nome Medicamento"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/txtMed" />
-
-
-    <TextView
-        android:id="@+id/receberDataHora"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginTop="24dp"
-        android:onClick="_pegarDataHoraAtt"
-        android:padding="8dp"
-        android:text="Receber Data e Hora"
-        android:textColor="#FF4081"
-        android:textSize="26sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/btnAtualizarMed"
-        app:layout_constraintTop_toBottomOf="@+id/txtHoraMedicamento" />
-
-    <TextView
-        android:id="@+id/txtHoraMedicamento"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_gravity="center"
-        android:layout_marginTop="20dp"
-        android:padding="8dp"
-        android:text="Horario do medicamento:"
-        android:textSize="18sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintBottom_toTopOf="@id/receberDataHora"
-        app:layout_constraintTop_toBottomOf="@+id/txtTipoMed" />
-
-    <Button
-        android:id="@+id/btnAdicionarMed"
-        android:layout_width="210dp"
-        android:layout_height="50sp"
-        android:layout_marginTop="40dp"
-        android:text="Adicionar Medicamento!"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.502"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/receberDataHora"
-        app:layout_constraintBottom_toTopOf="@id/btnAtualizarMed"
-        />
-
-    <Button
-        android:id="@+id/btnAtualizarMed"
-        android:layout_width="210sp"
-        android:layout_height="50sp"
-
-        android:text="Atulizar Medicamento!"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btnAdicionarMed"
-        app:layout_constraintBottom_toTopOf="@+id/btnExcluirMed"
-        />
-
-    <Button
-        android:id="@+id/btnExcluirMed"
-        android:layout_width="210sp"
-        android:layout_height="50sp"
+        <EditText
+            android:id="@+id/editNomeMed"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="36dp"
+            android:hint="Nome Medicamento"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/txtMed" />
 
 
-        android:text="Excluir Medicamento!"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/btnAtualizarMed" />
 
-    <Spinner
-        android:id="@+id/spinner"
-        android:layout_width="132dp"
-        android:layout_height="24dp"
-        android:paddingStart="10dp"
-        app:layout_constraintBottom_toBottomOf="@+id/txtTipoMed"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.175"
-        app:layout_constraintStart_toEndOf="@+id/txtTipoMed"
-        app:layout_constraintTop_toTopOf="@+id/txtTipoMed" />
+        <TextView
+            android:id="@+id/txtHoraMedicamento"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:layout_marginTop="20dp"
+            android:padding="8dp"
+            android:text="Horario do medicamento:"
+            android:textSize="18sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/txtTipoMed" />
 
+        <TextView
+            android:id="@+id/txtHorarioInicial"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Horário Inicial:"
+            android:textColor="@color/black"
+            android:textSize="18sp"
+            app:layout_constraintTop_toBottomOf="@+id/txtHoraMedicamento"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginTop="20dp" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+        <TextView
+            android:id="@+id/txtHorarioSelecionado"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="00:00"
+            android:textColor="#FF4081"
+            android:textSize="18sp"
+            android:padding="8dp"
+            android:onClick="_selecionarHorario"
+            app:layout_constraintTop_toTopOf="@+id/txtHorarioInicial"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <TextView
+            android:id="@+id/txtIntervalo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Intervalo entre doses (h):"
+            android:textColor="@color/black"
+            android:textSize="18sp"
+            app:layout_constraintTop_toBottomOf="@+id/txtHorarioInicial"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginTop="20dp" />
+
+        <EditText
+            android:id="@+id/editIntervalo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="number"
+            android:hint="Ex: 8"
+            app:layout_constraintTop_toBottomOf="@+id/txtIntervalo"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <TextView
+            android:id="@+id/txtDuracao"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Duração do tratamento (dias):"
+            android:textColor="@color/black"
+            android:textSize="18sp"
+            app:layout_constraintTop_toBottomOf="@+id/editIntervalo"
+            app:layout_constraintStart_toStartOf="parent"
+            android:layout_marginTop="20dp" />
+
+        <EditText
+            android:id="@+id/editDuracao"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:inputType="number"
+            android:hint="Ex: 7"
+            app:layout_constraintTop_toBottomOf="@+id/txtDuracao"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent" />
+
+        <Button
+            android:id="@+id/btnAdicionarMed"
+            android:layout_width="210dp"
+            android:layout_height="50sp"
+            android:layout_marginTop="40dp"
+            android:text="Adicionar Medicamento!"
+            app:layout_constraintTop_toBottomOf="@+id/editDuracao"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintBottom_toTopOf="@id/btnAtualizarMed" />
+
+        <Button
+            android:id="@+id/btnAtualizarMed"
+            android:layout_width="210sp"
+            android:layout_height="50sp"
+            android:enabled="false"
+            android:text="Atulizar Medicamento!"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/btnAdicionarMed"
+            app:layout_constraintBottom_toTopOf="@+id/btnExcluirMed" />
+
+        <Button
+            android:id="@+id/btnExcluirMed"
+            android:layout_width="210sp"
+            android:layout_height="50sp"
+            android:enabled="false"
+            android:text="Excluir Medicamento!"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/btnAtualizarMed" />
+
+        <Spinner
+            android:id="@+id/spinnerAdm"
+            android:layout_width="193dp"
+            android:layout_height="22dp"
+            android:entries="@array/activityTelaEditarMedicamentosSinnerAdmMedicamentos"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.175"
+            app:layout_constraintStart_toEndOf="@+id/txtTipoMed"
+            app:layout_constraintTop_toTopOf="@+id/txtTipoMed" />
+
+        <!-- Fim do conteúdo -->
+    </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

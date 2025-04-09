@@ -1,3 +1,15 @@
 <resources>
-    <string name="app_name">Controle-de-Medicamentos</string>
+    <string name="app_name">Controle de Medicamentos</string>
+    
+    <string-array name="activityTelaEditarMedicamentosSinnerAdmMedicamentos">
+        <item>Oral</item>
+        <item>Parenteral</item>
+        <item>Tópica</item>
+        <item>Inalatória</item>
+        <item>Sublingual</item>
+        <item>Retal</item>
+        <item>Dermatológica</item>
+        <item>Nasal</item>
+        <item>Oftálmica</item>
+    </string-array>
 </resources>
