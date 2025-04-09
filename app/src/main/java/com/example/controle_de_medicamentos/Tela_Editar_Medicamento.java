@@ -1,7 +1,6 @@
 package com.example.controle_de_medicamentos;
 
 import android.app.AlertDialog;
-import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -23,20 +22,20 @@ import java.util.Locale;
 
 public class Tela_Editar_Medicamento extends AppCompatActivity {
 
+    Intent get_Intent;
     private TextView txtHorarioSelecionado;
     private EditText editNomeMed;
     private EditText editDesc;
     private EditText editDose;
+    private EditText editIntervalo;
+    private EditText editDuracao;
     private Button btnAdicionarMed;
     private Button btnAtualizarMed;
     private Button btnExcluirMed;
     private SQLiteDatabase bancoDeDados;
     private DatabaseHelper dbHelper;
     private Spinner spinnerAdm;
-
     private ArrayList<String> itens_admMed;
-
-    Intent get_Intent;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -48,6 +47,8 @@ public class Tela_Editar_Medicamento extends AppCompatActivity {
         editNomeMed = findViewById(R.id.editNomeMed);
         editDesc = findViewById(R.id.editDesc);
         editDose = findViewById(R.id.editDose);
+        editIntervalo = findViewById(R.id.editIntervalo);
+        editDuracao = findViewById(R.id.editDuracao);
         txtHorarioSelecionado = findViewById(R.id.txtHorarioSelecionado);
         spinnerAdm = findViewById(R.id.spinnerAdm);
 
@@ -77,20 +78,43 @@ public class Tela_Editar_Medicamento extends AppCompatActivity {
         btnAdicionarMed.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                String nomeMed = editNomeMed.getText().toString();
-                String descMed = editDesc.getText().toString();
-                String doseMed = editDose.getText().toString();
-                String horario = txtHorarioSelecionado.getText().toString();
-                String admMed = spinnerAdm.getSelectedItem().toString();
+                try {
+                    // Obter os dados dos campos de texto
+                    String nomeMed = editNomeMed.getText().toString();
+                    String descMed = editDesc.getText().toString();
+                    String doseMed = editDose.getText().toString();
+                    String horario = txtHorarioSelecionado.getText().toString();
+                    String admMed = spinnerAdm.getSelectedItem().toString();
+                    // Verificar se os campos estão preenchidos
+                    if (nomeMed.isEmpty() || descMed.isEmpty() || doseMed.isEmpty() || horario.isEmpty()
+                            || editIntervalo.getText().toString().isEmpty()
+                            || editDuracao.getText().toString().isEmpty()) {
+                        Toast.makeText(Tela_Editar_Medicamento.this, "Preencha todos os campos corretamente!", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
+
+                    Integer intervalo_horas;
+                    Integer duracao_dias;
 
 
-                _AdicionarMedicamento(nomeMed,descMed,doseMed, horario,admMed);
+                    try {
+                        intervalo_horas = Integer.parseInt(editIntervalo.getText().toString());
+                        duracao_dias = Integer.parseInt(editDuracao.getText().toString());
+                    } catch (NumberFormatException e) {
+                        Toast.makeText(Tela_Editar_Medicamento.this, "Intervalo ou duração inválidos!", Toast.LENGTH_SHORT).show();
+                        return;
+                    }
 
-                System.out.println("Ola");
-                Intent resultadoIntent = new Intent();
-                setResult(RESULT_OK, resultadoIntent); // Enviando os dados de volta
-                finish();
 
+                    _AdicionarMedicamento(nomeMed, descMed, doseMed, horario, admMed, intervalo_horas, duracao_dias);
+
+                    Intent resultadoIntent = new Intent();
+                    setResult(RESULT_OK, resultadoIntent); // Enviando os dados de volta
+                    finish();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Toast.makeText(Tela_Editar_Medicamento.this, "Erro: " + e.getMessage(), Toast.LENGTH_LONG).show();
+                }
             }
         });
 
@@ -98,27 +122,34 @@ public class Tela_Editar_Medicamento extends AppCompatActivity {
         btnAtualizarMed.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                try {
+                    // Atualiza o medicamento com os novos dados
 
-                String dataHoraAtt = txtHorarioSelecionado.getText().toString();
-                Integer id = get_Intent.getIntExtra("id", 0);
+                    String dataHoraAtt = txtHorarioSelecionado.getText().toString();
+                    Integer id = get_Intent.getIntExtra("id", 0);
 
-                _AtualizarMedicamento(dataHoraAtt, id);
+                    _AtualizarMedicamento(dataHoraAtt, id);
 
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Toast.makeText(Tela_Editar_Medicamento.this, "Erro ao atualizar o medicamento!", Toast.LENGTH_SHORT).show();
+                }
             }
         });
 
         btnExcluirMed.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-
-                Integer id = get_Intent.getIntExtra("id", 0);
-                _ConfirmarExclusao(id); // Exclui o medicamento
-
-
+                try {
+                    // Obter o ID do medicamento a ser excluído
+                    Integer id = get_Intent.getIntExtra("id", 0);
+                    _ConfirmarExclusao(id); // Exclui o medicamento
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Toast.makeText(Tela_Editar_Medicamento.this, "Erro ao excluir o medicamento!", Toast.LENGTH_SHORT).show();
+                }
             }
         });
-//        carregarTarefa();
-
     }
 
 
@@ -135,6 +166,9 @@ public class Tela_Editar_Medicamento extends AppCompatActivity {
                 String admMed = get_Intent.getStringExtra("admMedicamento");
                 String descMed = get_Intent.getStringExtra("descricaoMedicamento");
                 String doseMed = get_Intent.getStringExtra("doseMedicamento");
+                String intervalo_horas = get_Intent.getStringExtra("intervalo_horas");
+                String duracao_dias = get_Intent.getStringExtra("duracao_dias");
+
 
                 int id = get_Intent.getIntExtra("id", 0);
 
@@ -143,6 +177,8 @@ public class Tela_Editar_Medicamento extends AppCompatActivity {
                 txtHorarioSelecionado.setText(dataHora);
                 editDesc.setText(descMed);
                 editDose.setText(doseMed);
+                editIntervalo.setText(intervalo_horas);
+                editDuracao.setText(duracao_dias);
 
                 // Preencher o Spinner, se necessário
                 if (spinnerAdm != null && admMed != null) {
@@ -166,49 +202,13 @@ public class Tela_Editar_Medicamento extends AppCompatActivity {
         dbHelper = new DatabaseHelper(this);
         bancoDeDados = dbHelper.getWritableDatabase(); // Abre o banco para leitura e escrita
     }
-    public void _pegarDataHoraAtt(View view) {
-        Calendar calendario = Calendar.getInstance();
-        int dia = calendario.get(Calendar.DAY_OF_MONTH);
-        int mes = calendario.get(Calendar.MONTH);
-        int ano = calendario.get(Calendar.YEAR);
 
-        DatePickerDialog datePickerDialog = new DatePickerDialog(this,
-                (view1, year, month, dayOfMonth) -> {
-                    //Atualiza o textview com a data selecionada
-                    String dataSelecionada = String.format("%02d/%02d/%04d", dayOfMonth, month + 1, year);
-                    txtHorarioSelecionado.setText(dataSelecionada);
-                    //Após escolher a data, chama o método para escolher a hora
-                    _pegarHora(null);
-                }, ano, mes, dia);
-        datePickerDialog.getDatePicker().setMinDate(System.currentTimeMillis());
-        datePickerDialog.show();
-    }
-
-    private void _pegarHora(View view) {
-        Calendar calendario = Calendar.getInstance();
-        int hora = calendario.get(Calendar.HOUR_OF_DAY);
-        int minuto = calendario.get(Calendar.MINUTE);
-
-        TimePickerDialog timePickerDialog = new TimePickerDialog(this,
-                (view12, hourOfDay, minute) -> {
-
-                    //Formatar Hora
-                    String time = String.format("%02d:%02d", hourOfDay, minute);
-                    //Concatena a data que ja existe com a hora
-                    txtHorarioSelecionado.setText(txtHorarioSelecionado.getText().toString() + " " + time);
-
-                }, hora, minuto, true);
-        timePickerDialog.show();
-    }
-
-
-    private void _AdicionarMedicamento(String nomeMed,String descMed,String doseMed,String dataHora,String admMed) {
+    private void _AdicionarMedicamento(String nomeMed, String descMed, String doseMed, String dataHora, String admMed, Integer intervalo_horas, Integer duracao_dias) {
         SQLiteStatement stmt = null;
-
         try {
 //            String admMed = itens_admMed.toString();
 
-            String sql = "INSERT INTO medicamentos (nomeMedicamento, dataHora, status, admMedicamento, descricao, dose) VALUES (?, ?, ?, ?, ?, ?)";
+            String sql = "INSERT INTO medicamentos (nomeMedicamento, dataHora, status, admMedicamento, descricao, dose, intervalo_horas, duracao_dias) VALUES (?, ?, ?, ?, ?, ?, ?, ?)";
             stmt = bancoDeDados.compileStatement(sql);
             stmt.bindString(1, nomeMed); // nome
             stmt.bindString(2, dataHora); // data e hora
@@ -216,17 +216,22 @@ public class Tela_Editar_Medicamento extends AppCompatActivity {
             stmt.bindString(4, admMed); // administração do medicamento
             stmt.bindString(5, descMed); // descrição do medicamento
             stmt.bindString(6, doseMed); // dose do medicamento
+            stmt.bindLong(7, intervalo_horas); // intervalo de horas
+            stmt.bindLong(8, duracao_dias); // duração em dias
+
 
             long id = stmt.executeInsert();
 
-
-            Toast.makeText(Tela_Editar_Medicamento.this, "Medicamento adicionado com sucesso! Com id="+id, Toast.LENGTH_SHORT).show();
-
+            Toast.makeText(Tela_Editar_Medicamento.this, "Medicamento adicionado com sucesso! Com id=" + id, Toast.LENGTH_SHORT).show();
 
         } catch (Exception e) {
             e.printStackTrace();
+            Toast.makeText(Tela_Editar_Medicamento.this, "Erro ao adicionar o medicamento! Não é no Botão Adicionar", Toast.LENGTH_SHORT).show();
         } finally {
-            stmt.close();
+            if (stmt != null) {
+                stmt.close();
+            }
+
         }
 
     }
@@ -236,14 +241,18 @@ public class Tela_Editar_Medicamento extends AppCompatActivity {
         String status = get_Intent.getStringExtra("status");
 
         String nomeMed = editNomeMed.getText().toString();
-        String admMed =  spinnerAdm.getSelectedItem().toString();
+        String admMed = spinnerAdm.getSelectedItem().toString();
         String descMed = editDesc.getText().toString();
         String doseMed = editDose.getText().toString();
+        Integer intervalo_horas = Integer.parseInt(editIntervalo.getText().toString());
+        Integer duracao_dias = Integer.parseInt(editDuracao.getText().toString());
+
+        if (status == null) status = "1";
 
         Intent resultadoIntent = new Intent();
         try {
             //Usando o SQLiteStatement para segurança e eficiência
-            String sql = "UPDATE medicamentos SET nomeMedicamento = ?, dataHora = ?, status = ?, admMedicamento = ?, descricao = ?, dose =? WHERE id = ?";
+            String sql = "UPDATE medicamentos SET nomeMedicamento = ?, dataHora = ?, status = ?, admMedicamento = ?, descricao = ?, dose =?, intervalo_horas = ?, duracao_dias = ? WHERE id = ?";
             stmt = bancoDeDados.compileStatement(sql);
             stmt.bindString(1, nomeMed);
             stmt.bindString(2, DataHoraAtt);
@@ -251,9 +260,12 @@ public class Tela_Editar_Medicamento extends AppCompatActivity {
             stmt.bindString(4, admMed);
             stmt.bindString(5, descMed);
             stmt.bindString(6, doseMed);
-            stmt.bindLong(7, id);
+            stmt.bindLong(7, intervalo_horas);
+            stmt.bindLong(8, duracao_dias);
+            stmt.bindLong(9, id);
 
             stmt.executeUpdateDelete();
+            Toast.makeText(Tela_Editar_Medicamento.this, "Medicamento atualizado com sucesso!", Toast.LENGTH_SHORT).show();
 
             setResult(RESULT_OK, resultadoIntent); // Enviando os dados de volta
             finish();
@@ -268,12 +280,6 @@ public class Tela_Editar_Medicamento extends AppCompatActivity {
         }
     }
 
-
-
-
-
-
-
     private void _ConfirmarExclusao(final Integer id) {
         // Criar um AlertDialog para confirmação
         new AlertDialog.Builder(Tela_Editar_Medicamento.this)
@@ -286,7 +292,7 @@ public class Tela_Editar_Medicamento extends AppCompatActivity {
                         // Caso o usuário confirme, chama o método de exclusão
                         _ExcluirMedicamento(id);
 
-                        setResult(RESULT_OK,resultadoIntent); // Passa a resposta de sucesso para a atividade anterior
+                        setResult(RESULT_OK, resultadoIntent); // Passa a resposta de sucesso para a atividade anterior
                         finish(); // Finaliza a atividade após a exclusão
                     }
                 })
@@ -315,12 +321,6 @@ public class Tela_Editar_Medicamento extends AppCompatActivity {
         timePickerDialog.show();
     }
 
-
-
-
-
-
-
     private void _ExcluirMedicamento(Integer id) {
         SQLiteStatement stmt = null;
         try {
@@ -336,14 +336,13 @@ public class Tela_Editar_Medicamento extends AppCompatActivity {
             } else {
                 Toast.makeText(Tela_Editar_Medicamento.this, "Erro ao excluir o Medicamento!", Toast.LENGTH_SHORT).show();
             }
-
-
-
         } catch (Exception e) {
             e.printStackTrace();
             Toast.makeText(Tela_Editar_Medicamento.this, "Erro ao excluir o Medicamento!", Toast.LENGTH_SHORT).show();
         } finally {
-            stmt.close();
+            if (stmt != null) {
+                stmt.close();
+            }
         }
     }
 }

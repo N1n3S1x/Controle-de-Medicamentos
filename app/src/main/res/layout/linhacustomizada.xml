@@ -10,9 +10,9 @@
         android:id="@+id/texto1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:textSize="26sp"
+        android:textSize="23sp"
         android:textStyle="bold"
-        android:text="texto1"
+        android:text="Nome:"
         android:textColor="#212121"/>
 
     <TextView
@@ -20,7 +20,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="20sp"
-        android:text="text2"
+        android:text="Horário"
         android:textColor="#757575"/>
     <TextView
         android:id="@+id/texto3"
@@ -28,6 +28,24 @@
         android:layout_height="wrap_content"
         android:textSize="20sp"
         android:text="Vias de administração: "
+        android:textColor="#757575"
+        android:textAlignment="textStart"
+        />
+    <TextView
+        android:id="@+id/texto4"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        android:text="Dose: "
+        android:textColor="#757575"
+        android:textAlignment="textStart"
+        />
+    <TextView
+        android:id="@+id/texto5"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textSize="20sp"
+        android:text="Descrição: "
         android:textColor="#757575"
         android:textAlignment="textStart"
         />

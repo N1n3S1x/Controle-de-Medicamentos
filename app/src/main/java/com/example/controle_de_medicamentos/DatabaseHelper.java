@@ -18,7 +18,10 @@ public class DatabaseHelper extends SQLiteOpenHelper {
         db.execSQL("CREATE TABLE IF NOT EXISTS " +
                 "medicamentos (id INTEGER PRIMARY KEY AUTOINCREMENT," +
                 "nomeMedicamento VARCHAR, dataHora VARCHAR, status VARCHAR," +
-                "admMedicamento VARCHAR, descricao VARCHAR, dose VARCHAR)");
+                "admMedicamento VARCHAR, descricao VARCHAR, dose VARCHAR," +
+                "intervalo_horas INTEGER,duracao_dias INTEGER)");
+
+
     }
 
     @Override

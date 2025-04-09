@@ -1,48 +1,36 @@
 package com.example.controle_de_medicamentos;
 
+import android.app.AlarmManager;
 import android.app.AlertDialog;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Color;
 import android.graphics.Paint;
 import android.os.Build;
 import android.os.Bundle;
-import android.text.Editable;
-import android.text.TextWatcher;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.app.ActivityCompat;
-import androidx.core.content.ContextCompat;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
-import java.util.ArrayList;
-//import do Menu
-import android.view.Menu;
-import android.view.MenuInflater;
-import android.view.MenuItem;
-import android.widget.SearchView;
-
-//Import do Alarme
-import android.app.AlarmManager;
-import android.app.PendingIntent;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 
@@ -59,10 +47,12 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<String> descricaoMedicamento;
     private ArrayList<String> admMedicamento;
     private ArrayList<String> doseMedicamento;
+    private ArrayList<Integer> intervalo_horas;
+    private ArrayList<Integer> duracao_dias;
     private ArrayAdapter<String> adaptador;
+    private DatabaseHelper dbHelper;
     private TextView campoDataHora;
     private SQLiteDatabase bancoDeDados;
-
 
 
     @Override
@@ -73,13 +63,10 @@ public class MainActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
 
 
-
         // Inicializar componentes da interface
 //        editTextFiltro = findViewById(R.id.editTextFiltro);
         botaoInserir = findViewById(R.id.botaoInserir);
         minhaListView = findViewById(R.id.minhaListView);
-
-
 
 
         _Criar_Banco_De_Dados();
@@ -103,7 +90,6 @@ public class MainActivity extends AppCompatActivity {
 //        }
 
 
-
         botaoInserir.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -123,7 +109,6 @@ public class MainActivity extends AppCompatActivity {
         }));
 
         _CarregarItens();
-
 
 
     }
@@ -178,10 +163,15 @@ public class MainActivity extends AppCompatActivity {
 
     public void _Criar_Banco_De_Dados() {
         try {
+
+//            DatabaseHelper databaseHelper = new DatabaseHelper(this);
+//            bancoDeDados = databaseHelper.getWritableDatabase();
+//            databaseHelper.onCreate(bancoDeDados);
+
             bancoDeDados = openOrCreateDatabase("ControleMedicamentos", MODE_PRIVATE, null);
             bancoDeDados.execSQL("CREATE TABLE IF NOT EXISTS " +
                     "medicamentos (id INTEGER PRIMARY KEY AUTOINCREMENT," +
-                    "nomeMedicamento VARCHAR, dataHora VARCHAR, status VARCHAR,admMedicamento VARCHAR, descricao VARCHAR, dose VARCHAR)");
+                    "nomeMedicamento VARCHAR, dataHora VARCHAR, status VARCHAR,admMedicamento VARCHAR, descricao VARCHAR, dose VARCHAR, intervalo_horas INTEGER, duracao_dias INTEGER)");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -199,6 +189,8 @@ public class MainActivity extends AppCompatActivity {
             int indice_admMed = cursor.getColumnIndex("admMedicamento");
             int indice_descMed = cursor.getColumnIndex("descricao");
             int indice_doseMed = cursor.getColumnIndex("dose");
+            int indice_duracao = cursor.getColumnIndex("duracao_dias");
+            int indice_intervalo = cursor.getColumnIndex("intervalo_horas");
 
             //inicializar as listas
             ids = new ArrayList<>();
@@ -208,10 +200,10 @@ public class MainActivity extends AppCompatActivity {
             descricaoMedicamento = new ArrayList<>();
             admMedicamento = new ArrayList<>();
             doseMedicamento = new ArrayList<>();
+            intervalo_horas = new ArrayList<>();
+            duracao_dias = new ArrayList<>();
 
             //inicializar o adaptador
-
-
             //adaptador usando o layout customizado
             adaptador = new ArrayAdapter<String>(this, R.layout.linhacustomizada,
                     R.id.texto1, itens) {
@@ -221,27 +213,40 @@ public class MainActivity extends AppCompatActivity {
                     TextView texto1 = view.findViewById(R.id.texto1);
                     TextView texto2 = view.findViewById(R.id.texto2);
                     TextView texto3 = view.findViewById(R.id.texto3);
+                    TextView texto4 = view.findViewById(R.id.texto4);
+                    TextView texto5 = view.findViewById(R.id.texto5);
 
                     // Define o valor do TextView de data/hora com base na posição -- retornando do BD
-                    texto1.setText("Nome Medicamento: "+itens.get(position));
-                    texto2.setText("Período: "+datasHoras.get(position));
-                    texto3.setText("Adm. Medicamento: "+admMedicamento.get(position));
-
+                    texto1.setText("Nome Medicamento: " + itens.get(position));
+                    texto2.setText("Horário: " + datasHoras.get(position));
+                    texto3.setText("Adm. Medicamento: " + admMedicamento.get(position));
+                    texto4.setText("Dose: " + doseMedicamento.get(position));
+                    texto5.setText("Descrição: " + descricaoMedicamento.get(position));
                     // Define o estilo do texto com base no status da tarefa
                     if (statusMedicamento.get(position).equals("1")) {
                         texto1.setTextColor(Color.BLACK);
                         texto2.setTextColor(Color.BLUE);
                         texto3.setTextColor(Color.BLACK);
+                        texto4.setTextColor(Color.BLACK);
+                        texto5.setTextColor(Color.BLACK);
+
                         texto1.setPaintFlags(texto1.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
                         texto2.setPaintFlags(texto2.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
                         texto3.setPaintFlags(texto3.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
+                        texto4.setPaintFlags(texto4.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
+                        texto5.setPaintFlags(texto5.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
                     } else {
                         texto1.setTextColor(Color.GRAY);
                         texto2.setTextColor(Color.GRAY);
                         texto3.setTextColor(Color.GRAY);
+                        texto4.setTextColor(Color.GRAY);
+                        texto5.setTextColor(Color.GRAY);
+
                         texto1.setPaintFlags(texto1.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
                         texto2.setPaintFlags(texto2.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
                         texto3.setPaintFlags(texto3.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+                        texto4.setPaintFlags(texto4.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
+                        texto5.setPaintFlags(texto5.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
                     }
 
                     return view;
@@ -259,12 +264,13 @@ public class MainActivity extends AppCompatActivity {
                 admMedicamento.add(cursor.getString(indice_admMed));
                 descricaoMedicamento.add(cursor.getString(indice_descMed));
                 doseMedicamento.add(cursor.getString(indice_doseMed));
+                intervalo_horas.add(cursor.getInt(indice_intervalo));
+                duracao_dias.add(cursor.getInt(indice_duracao));
+
                 // Agendar notificação
                 if (statusMedicamento.get(ids.size() - 1).equals("1")) {
                     agendarNotificacao(datasHoras.get(ids.size() - 1), itens.get(ids.size() - 1), ids.get(ids.size() - 1));
-
                 }
-
                 cursor.moveToNext();
             }
             cursor.close(); //liberando memória, tornando mais eficiente
@@ -288,6 +294,10 @@ public class MainActivity extends AppCompatActivity {
             int indiceAdmMed = cursor.getColumnIndex("admMedicamento");
             int indiceDescMed = cursor.getColumnIndex("descricao");
             int indiceDoseMed = cursor.getColumnIndex("dose");
+            int indiceIntervalo = cursor.getColumnIndex("intervalo_horas");
+            int indiceDuracao = cursor.getColumnIndex("duracao_dias");
+
+
 
             ids.clear();
             itens.clear();
@@ -306,6 +316,11 @@ public class MainActivity extends AppCompatActivity {
                 admMedicamento.add(cursor.getString(indiceAdmMed));
                 descricaoMedicamento.add(cursor.getString(indiceDescMed));
                 doseMedicamento.add(cursor.getString(indiceDoseMed));
+                intervalo_horas.add(cursor.getInt(indiceIntervalo));
+                duracao_dias.add(cursor.getInt(indiceDuracao));
+
+
+
                 cursor.moveToNext();
             }
 
@@ -355,7 +370,7 @@ public class MainActivity extends AppCompatActivity {
                     pendingIntent
             );
 
-            Log.d("Alarme", "Notificação agendada para: " + calendarioAlarme.getTime().toString());
+            Log.d("Alarme", "Notificação agendada para: " + calendarioAlarme.getTime());
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -410,13 +425,12 @@ public class MainActivity extends AppCompatActivity {
 
                 .show();
     }
+
     private void mudarTelaEdicao(int position) {
         try {
 
             Toast.makeText(MainActivity.this, "Editar Medicamento!",
                     Toast.LENGTH_SHORT).show();
-
-            boolean sinal = true;
 
             Intent intent = new Intent(MainActivity.this, Tela_Editar_Medicamento.class);
             intent.putExtra("id", ids.get(position));
@@ -425,13 +439,23 @@ public class MainActivity extends AppCompatActivity {
             intent.putExtra("status", statusMedicamento.get(position));
             intent.putExtra("admMedicamento", admMedicamento.get(position));
 
+
             intent.putExtra("edicao_Med", true);
-            intent.putExtra("sinalEdicao", sinal);
 
             intent.putExtra("descricaoMedicamento",
                     (descricaoMedicamento.size() > position ? descricaoMedicamento.get(position) : ""));
             intent.putExtra("doseMedicamento",
                     (doseMedicamento.size() > position ? doseMedicamento.get(position) : ""));
+
+            intent.putExtra("intervalo_horas",
+                    (intervalo_horas.size() > position ? intervalo_horas.get(position).toString() : ""));
+            intent.putExtra("duracao_dias",
+                    (duracao_dias.size() > position ? duracao_dias.get(position).toString() : ""));
+
+
+
+
+
 
 
 
@@ -439,14 +463,14 @@ public class MainActivity extends AppCompatActivity {
             startActivityForResult(intent, 1);
 
 
-        }catch (Exception e) {
+        } catch (Exception e) {
 
             e.printStackTrace();
         }
 
     }
 
-    private void mudarTelaInsercao(){
+    private void mudarTelaInsercao() {
         try {
             Intent intent = new Intent(MainActivity.this, Tela_Editar_Medicamento.class);
 //            startActivity(intent);
@@ -455,7 +479,6 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
     }
-
 
 
 }
