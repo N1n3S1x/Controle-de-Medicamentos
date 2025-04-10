@@ -210,7 +210,7 @@ public class MainActivity extends AppCompatActivity {
 
                     // Define o valor do TextView de data/hora com base na posição -- retornando do BD
                     String statusLabel;
-                    texto1.setText("Nome Medicamento: " + itens.get(position) );
+                    texto1.setText("Nome Medicamento: \n" + itens.get(position) );
 
                     texto2.setText("Horário: " + datasHoras.get(position));
                     texto3.setText("Adm. Medicamento: " + admMedicamento.get(position));
