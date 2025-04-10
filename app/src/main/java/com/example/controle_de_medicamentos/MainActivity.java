@@ -53,6 +53,7 @@ public class MainActivity extends AppCompatActivity {
     private DatabaseHelper dbHelper;
     private TextView campoDataHora;
     private SQLiteDatabase bancoDeDados;
+    private TextView textoStatus;
 
 
     @Override
@@ -72,23 +73,11 @@ public class MainActivity extends AppCompatActivity {
         _Criar_Banco_De_Dados();
         // permissões para notificações 8.0+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-            NotificationChannel channel = new NotificationChannel(
-                    "canal_notificacao",
-                    "Canal de Notificações",
-                    NotificationManager.IMPORTANCE_HIGH
-            );
+            NotificationChannel channel = new NotificationChannel("canal_notificacao", "Canal de Notificações", NotificationManager.IMPORTANCE_HIGH);
             channel.setDescription("Notificações do Controle de Medicamentos");
             NotificationManager manager = getSystemService(NotificationManager.class);
             manager.createNotificationChannel(channel);
         }
-//        //Permissões para notificações 13.0+
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-//            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
-//                    != PackageManager.PERMISSION_GRANTED) {
-//                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.POST_NOTIFICATIONS}, 1001);
-//            }
-//        }
-
 
         botaoInserir.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -109,8 +98,6 @@ public class MainActivity extends AppCompatActivity {
         }));
 
         _CarregarItens();
-
-
     }
 
     @Override
@@ -164,14 +151,15 @@ public class MainActivity extends AppCompatActivity {
     public void _Criar_Banco_De_Dados() {
         try {
 
-//            DatabaseHelper databaseHelper = new DatabaseHelper(this);
-//            bancoDeDados = databaseHelper.getWritableDatabase();
-//            databaseHelper.onCreate(bancoDeDados);
+            DatabaseHelper databaseHelper = new DatabaseHelper(this);
+            bancoDeDados = databaseHelper.getWritableDatabase();
+            databaseHelper.onCreate(bancoDeDados);
 
-            bancoDeDados = openOrCreateDatabase("ControleMedicamentos", MODE_PRIVATE, null);
-            bancoDeDados.execSQL("CREATE TABLE IF NOT EXISTS " +
-                    "medicamentos (id INTEGER PRIMARY KEY AUTOINCREMENT," +
-                    "nomeMedicamento VARCHAR, dataHora VARCHAR, status VARCHAR,admMedicamento VARCHAR, descricao VARCHAR, dose VARCHAR, intervalo_horas INTEGER, duracao_dias INTEGER)");
+//            bancoDeDados = openOrCreateDatabase("ControleMedicamentos", MODE_PRIVATE, null);
+//            bancoDeDados.execSQL("CREATE TABLE IF NOT EXISTS " +
+//                    "medicamentos (id INTEGER PRIMARY KEY AUTOINCREMENT," +
+//                    "nomeMedicamento VARCHAR, dataHora VARCHAR, status VARCHAR,admMedicamento VARCHAR," +
+//                    " descricao VARCHAR, dose VARCHAR, intervalo_horas INTEGER, duracao_dias INTEGER)");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -179,8 +167,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void _CarregarItens() {
         try {
-            Cursor cursor = bancoDeDados.rawQuery("SELECT * FROM medicamentos " +
-                    "ORDER BY id DESC", null);
+            Cursor cursor = bancoDeDados.rawQuery("SELECT * FROM medicamentos " + "ORDER BY id DESC", null);
             //indíces das colunas
             int indiceId = cursor.getColumnIndex("id");
             int indiceMedicamento = cursor.getColumnIndex("nomeMedicamento");
@@ -205,8 +192,7 @@ public class MainActivity extends AppCompatActivity {
 
             //inicializar o adaptador
             //adaptador usando o layout customizado
-            adaptador = new ArrayAdapter<String>(this, R.layout.linhacustomizada,
-                    R.id.texto1, itens) {
+            adaptador = new ArrayAdapter<String>(this, R.layout.linhacustomizada, R.id.texto1, itens) {
                 @Override
                 public View getView(int position, View convertView, ViewGroup parent) {
                     View view = super.getView(position, convertView, parent);
@@ -215,13 +201,21 @@ public class MainActivity extends AppCompatActivity {
                     TextView texto3 = view.findViewById(R.id.texto3);
                     TextView texto4 = view.findViewById(R.id.texto4);
                     TextView texto5 = view.findViewById(R.id.texto5);
+                    TextView textoStatus = view.findViewById(R.id.statusLabel);
 
                     // Define o valor do TextView de data/hora com base na posição -- retornando do BD
-                    texto1.setText("Nome Medicamento: " + itens.get(position));
+                    String statusLabel;
+                    texto1.setText("Nome Medicamento: " + itens.get(position) );
+
                     texto2.setText("Horário: " + datasHoras.get(position));
                     texto3.setText("Adm. Medicamento: " + admMedicamento.get(position));
                     texto4.setText("Dose: " + doseMedicamento.get(position));
                     texto5.setText("Descrição: " + descricaoMedicamento.get(position));
+
+
+                    statusLabel = statusMedicamento.get(position).equals("1") ? "Pendente" : "Tomado";
+                    textoStatus.setText("Status: " + statusLabel);
+
                     // Define o estilo do texto com base no status da tarefa
                     if (statusMedicamento.get(position).equals("1")) {
                         texto1.setTextColor(Color.BLACK);
@@ -279,13 +273,9 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
     }
-
     public void _FiltrarItens(String filtro) {
         try {
-            Cursor cursor = bancoDeDados.rawQuery(
-                    "SELECT * FROM medicamentos WHERE nomeMedicamento LIKE ? OR admMedicamento LIKE ? ORDER BY id DESC",
-                    new String[]{"%" + filtro + "%", "%" + filtro + "%"}
-            );
+            Cursor cursor = bancoDeDados.rawQuery("SELECT * FROM medicamentos WHERE nomeMedicamento LIKE ? OR admMedicamento LIKE ? ORDER BY id DESC", new String[]{"%" + filtro + "%", "%" + filtro + "%"});
 
             int indiceId = cursor.getColumnIndex("id");
             int indiceMedicamento = cursor.getColumnIndex("nomeMedicamento");
@@ -296,7 +286,6 @@ public class MainActivity extends AppCompatActivity {
             int indiceDoseMed = cursor.getColumnIndex("dose");
             int indiceIntervalo = cursor.getColumnIndex("intervalo_horas");
             int indiceDuracao = cursor.getColumnIndex("duracao_dias");
-
 
 
             ids.clear();
@@ -318,7 +307,6 @@ public class MainActivity extends AppCompatActivity {
                 doseMedicamento.add(cursor.getString(indiceDoseMed));
                 intervalo_horas.add(cursor.getInt(indiceIntervalo));
                 duracao_dias.add(cursor.getInt(indiceDuracao));
-
 
 
                 cursor.moveToNext();
@@ -355,20 +343,12 @@ public class MainActivity extends AppCompatActivity {
             Intent intent = new Intent(this, AlarmReceiver.class);
             intent.putExtra("nome", nomeMedicamento);
 
-            PendingIntent pendingIntent = PendingIntent.getBroadcast(
-                    this, idMedicamento, intent,
-                    PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
-            );
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(this, idMedicamento, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
 
             AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
             long intervalo = AlarmManager.INTERVAL_DAY;
 
-            alarmManager.setRepeating(
-                    AlarmManager.RTC_WAKEUP,
-                    calendarioAlarme.getTimeInMillis(),
-                    intervalo,
-                    pendingIntent
-            );
+            alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendarioAlarme.getTimeInMillis(), intervalo, pendingIntent);
 
             Log.d("Alarme", "Notificação agendada para: " + calendarioAlarme.getTime());
 
@@ -380,10 +360,7 @@ public class MainActivity extends AppCompatActivity {
 
     public void cancelarNotificacao(int idMedicamento) {
         Intent intent = new Intent(this, AlarmReceiver.class);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(
-                this, idMedicamento, intent,
-                PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE
-        );
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, idMedicamento, intent, PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE);
         AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
         alarmManager.cancel(pendingIntent);
     }
@@ -393,15 +370,14 @@ public class MainActivity extends AppCompatActivity {
             String novoStatus = statusMedicamento.get(position).equals("1") ? "0" : "1";
             int idMedicamento = ids.get(position);
 
-            bancoDeDados.execSQL("UPDATE medicamentos SET status = '" +
-                    novoStatus + "' WHERE id = " + idMedicamento);
+            bancoDeDados.execSQL("UPDATE medicamentos SET status = '" + novoStatus + "' WHERE id = " + idMedicamento);
 
             if (novoStatus.equals("1")) {
                 agendarNotificacao(datasHoras.get(position), itens.get(position), idMedicamento);
-                Toast.makeText(MainActivity.this, "Medicamento em Uso!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, "Medicamento pendente!", Toast.LENGTH_SHORT).show();
             } else {
                 cancelarNotificacao(idMedicamento);
-                Toast.makeText(MainActivity.this, "Medicamento Finalizado!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(MainActivity.this, "Medicamento Tomado!", Toast.LENGTH_SHORT).show();
             }
 
             _CarregarItens();
@@ -412,16 +388,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void editarMedicamento(int position) {
-        new AlertDialog.Builder(MainActivity.this)
-                .setTitle("Editar Tarefa")
-                .setMessage("Deseja editar o medicamento \"" + itens.get(position) + "\"?")
-                .setPositiveButton("Sim", (dialog, which) -> {
-                    mudarTelaEdicao(position);
-                })
+        new AlertDialog.Builder(MainActivity.this).setTitle("Editar medicamento").setMessage("Deseja editar " +
+                        "o medicamento \"" + itens.get(position) + "\"?").setPositiveButton("Sim", (dialog, which) -> {
+                    mudarTelaEdicao(position);})
                 .setNegativeButton("Não", null)
-                .setNeutralButton("Compartilhar", (dialogInterface, i) -> {
-                    //compartilharTarefa(position);
-                })
+
 
                 .show();
     }
@@ -429,8 +400,7 @@ public class MainActivity extends AppCompatActivity {
     private void mudarTelaEdicao(int position) {
         try {
 
-            Toast.makeText(MainActivity.this, "Editar Medicamento!",
-                    Toast.LENGTH_SHORT).show();
+            Toast.makeText(MainActivity.this, "Editar Medicamento!", Toast.LENGTH_SHORT).show();
 
             Intent intent = new Intent(MainActivity.this, Tela_Editar_Medicamento.class);
             intent.putExtra("id", ids.get(position));
@@ -442,22 +412,11 @@ public class MainActivity extends AppCompatActivity {
 
             intent.putExtra("edicao_Med", true);
 
-            intent.putExtra("descricaoMedicamento",
-                    (descricaoMedicamento.size() > position ? descricaoMedicamento.get(position) : ""));
-            intent.putExtra("doseMedicamento",
-                    (doseMedicamento.size() > position ? doseMedicamento.get(position) : ""));
+            intent.putExtra("descricaoMedicamento", (descricaoMedicamento.size() > position ? descricaoMedicamento.get(position) : ""));
+            intent.putExtra("doseMedicamento", (doseMedicamento.size() > position ? doseMedicamento.get(position) : ""));
 
-            intent.putExtra("intervalo_horas",
-                    (intervalo_horas.size() > position ? intervalo_horas.get(position).toString() : ""));
-            intent.putExtra("duracao_dias",
-                    (duracao_dias.size() > position ? duracao_dias.get(position).toString() : ""));
-
-
-
-
-
-
-
+            intent.putExtra("intervalo_horas", (intervalo_horas.size() > position ? intervalo_horas.get(position).toString() : ""));
+            intent.putExtra("duracao_dias", (duracao_dias.size() > position ? duracao_dias.get(position).toString() : ""));
 
 //            startActivity(intent);
             startActivityForResult(intent, 1);

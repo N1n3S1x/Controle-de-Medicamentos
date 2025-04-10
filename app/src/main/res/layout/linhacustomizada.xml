@@ -49,6 +49,14 @@
         android:textColor="#757575"
         android:textAlignment="textStart"
         />
+    <TextView
+        android:id="@+id/statusLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="status"
+        android:textColor="#888888"
+        android:textStyle="italic"/>
+
 
 
 </LinearLayout>

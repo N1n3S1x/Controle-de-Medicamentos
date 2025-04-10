@@ -32,7 +32,7 @@ public class AlarmReceiver extends BroadcastReceiver {
 
         // Criar canal de notificação (Android 8+)
         NotificationManager manager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.O) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel canal = new NotificationChannel(canalId, canalNome,
                     NotificationManager.IMPORTANCE_HIGH);
             canal.enableLights(true);
@@ -41,13 +41,7 @@ public class AlarmReceiver extends BroadcastReceiver {
             canal.setLockscreenVisibility(NotificationCompat.VISIBILITY_PUBLIC);
             manager.createNotificationChannel(canal);
         }
-        //Permissões para notificações 13.0+
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-//            if (ContextCompat.checkSelfPermission(this, Manifest.permission.POST_NOTIFICATIONS)
-//                    != PackageManager.PERMISSION_GRANTED) {
-//                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.POST_NOTIFICATIONS}, 1001);
-//            }
-//        }
+
 
         // Intent ao clicar na notificação
         Intent notificacaoIntent = new Intent(context, MainActivity.class);
