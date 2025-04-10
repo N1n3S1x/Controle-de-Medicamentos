@@ -178,6 +178,12 @@ public class MainActivity extends AppCompatActivity {
             int indice_duracao = cursor.getColumnIndex("duracao_dias");
             int indice_intervalo = cursor.getColumnIndex("intervalo_horas");
 
+            //Definir cores
+            final int corTextoPrincipal = Color.parseColor("#1976D2"); // azul principal
+            final int corTextoSecundario = Color.parseColor("#0288D1"); // azul claro
+            final int corTextoAtivo = Color.parseColor("#388E3C"); // verde
+            final int corTextoInativo = Color.parseColor("#757575"); // cinza
+
             //inicializar as listas
             ids = new ArrayList<>();
             itens = new ArrayList<>();
@@ -217,11 +223,12 @@ public class MainActivity extends AppCompatActivity {
 
                     // Define o estilo do texto com base no status da tarefa
                     if (statusMedicamento.get(position).equals("1")) {
-                        texto1.setTextColor(Color.BLACK);
-                        texto2.setTextColor(Color.BLUE);
-                        texto3.setTextColor(Color.BLACK);
-                        texto4.setTextColor(Color.BLACK);
-                        texto5.setTextColor(Color.BLACK);
+                        texto1.setTextColor(corTextoPrincipal);
+                        texto2.setTextColor(corTextoSecundario);
+                        texto3.setTextColor(Color.DKGRAY);
+                        texto4.setTextColor(corTextoSecundario);
+                        texto5.setTextColor(Color.DKGRAY);
+                        textoStatus.setTextColor(corTextoAtivo);
 
                         texto1.setPaintFlags(texto1.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
                         texto2.setPaintFlags(texto2.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
@@ -229,11 +236,12 @@ public class MainActivity extends AppCompatActivity {
                         texto4.setPaintFlags(texto4.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
                         texto5.setPaintFlags(texto5.getPaintFlags() & (~Paint.STRIKE_THRU_TEXT_FLAG));
                     } else {
-                        texto1.setTextColor(Color.GRAY);
-                        texto2.setTextColor(Color.GRAY);
-                        texto3.setTextColor(Color.GRAY);
-                        texto4.setTextColor(Color.GRAY);
-                        texto5.setTextColor(Color.GRAY);
+                        texto1.setTextColor(corTextoInativo);
+                        texto2.setTextColor(corTextoInativo);
+                        texto3.setTextColor(corTextoInativo);
+                        texto4.setTextColor(corTextoInativo);
+                        texto5.setTextColor(corTextoInativo);
+                        textoStatus.setTextColor(corTextoInativo);
 
                         texto1.setPaintFlags(texto1.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
                         texto2.setPaintFlags(texto2.getPaintFlags() | Paint.STRIKE_THRU_TEXT_FLAG);
