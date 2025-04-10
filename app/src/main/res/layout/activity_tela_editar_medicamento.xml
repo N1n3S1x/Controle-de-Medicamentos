@@ -99,7 +99,7 @@
             android:layout_height="wrap_content"
             android:layout_gravity="center"
             android:layout_marginTop="44dp"
-            android:text="Tipo Medicamento:"
+            android:text="Adm. Medicamento:"
             android:textAlignment="center"
             android:textColor="#6B4CAF"
             android:textSize="20sp"
