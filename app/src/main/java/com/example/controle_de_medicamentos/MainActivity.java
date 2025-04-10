@@ -62,12 +62,10 @@ public class MainActivity extends AppCompatActivity {
         Toolbar toolbar = findViewById(R.id.toolBar);
         setSupportActionBar(toolbar);
 
-
         // Inicializar componentes da interface
 //        editTextFiltro = findViewById(R.id.editTextFiltro);
         botaoInserir = findViewById(R.id.botaoInserir);
         minhaListView = findViewById(R.id.minhaListView);
-
 
         _Criar_Banco_De_Dados();
         // permissões para notificações 8.0+
@@ -125,7 +123,6 @@ public class MainActivity extends AppCompatActivity {
 
         return true;
     }
-
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -211,7 +208,6 @@ public class MainActivity extends AppCompatActivity {
                     // Define o valor do TextView de data/hora com base na posição -- retornando do BD
                     String statusLabel;
                     texto1.setText("Nome Medicamento: \n" + itens.get(position) );
-
                     texto2.setText("Horário: " + datasHoras.get(position));
                     texto3.setText("Adm. Medicamento: " + admMedicamento.get(position));
                     texto4.setText("Dose: " + doseMedicamento.get(position));
@@ -280,6 +276,7 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
     }
+
     public void _FiltrarItens(String filtro) {
         try {
             Cursor cursor = bancoDeDados.rawQuery("SELECT * FROM medicamentos WHERE nomeMedicamento LIKE ? OR admMedicamento LIKE ? ORDER BY id DESC", new String[]{"%" + filtro + "%", "%" + filtro + "%"});
@@ -357,13 +354,12 @@ public class MainActivity extends AppCompatActivity {
 
             alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendarioAlarme.getTimeInMillis(), intervalo, pendingIntent);
 
-            Log.d("Alarme", "Notificação agendada para: " + calendarioAlarme.getTime());
+            Log.d("Alarme", "Notificação agendada para: " + calendarioAlarme.getTime()+" \nNome medicamento: "+nomeMedicamento+" ID: "+idMedicamento);
 
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
-
 
     public void cancelarNotificacao(int idMedicamento) {
         Intent intent = new Intent(this, AlarmReceiver.class);
@@ -445,6 +441,4 @@ public class MainActivity extends AppCompatActivity {
             e.printStackTrace();
         }
     }
-
-
 }
