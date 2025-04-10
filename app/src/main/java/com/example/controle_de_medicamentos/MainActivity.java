@@ -37,7 +37,6 @@ import java.util.Date;
 
 public class MainActivity extends AppCompatActivity {
 
-    private EditText editTextFiltro;
     private Button botaoInserir;
     private ListView minhaListView;
     private ArrayList<String> itens;
@@ -51,9 +50,9 @@ public class MainActivity extends AppCompatActivity {
     private ArrayList<Integer> duracao_dias;
     private ArrayAdapter<String> adaptador;
     private DatabaseHelper dbHelper;
-    private TextView campoDataHora;
+
     private SQLiteDatabase bancoDeDados;
-    private TextView textoStatus;
+
 
 
     @Override
@@ -134,7 +133,7 @@ public class MainActivity extends AppCompatActivity {
 
         if (requestCode == 1 && resultCode == RESULT_OK) { // ✅ Verifica se veio da MainActivity2
             int id = data.getIntExtra("id", 0);
-            String tarefaAtualizada = data.getStringExtra("tarefa");
+            String nomeMed = data.getStringExtra("nomeMed");
             String dataHoraAtualizada = data.getStringExtra("dataHora");
 
             // Atualiza os dados no banco ou na interface
